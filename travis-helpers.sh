@@ -1,4 +1,19 @@
 #!/usr/bin/env bash
+# Exports environment variables and functions for use in CI environments
+#
+# Exported variables
+# ==================
+# RUNDECK_BUILD_NUMBER = build number from TRAVIS_BUILD_NUMBER
+# RUNDECK_RELEASE_TAG = (SNAPSHOT|GA|other) extracted from TRAVIS_TAG
+# RUNDECK_RELEASE_VERSION = version number extracted from TRAVIS_TAG
+# RUNDECK_PREV_RELEASE_VERSION = same as above extracted from second oldest tag in git history
+# RUNDECK_PREV_RELEASE_VERSION = same as above extracted from second oldest tag in git history
+#
+# BINTRAY_DEB_REPO = selected deb bintray repo based on release tag
+# BINTRAY_RPM_REPO = selected rpm bintray repo based on release tag
+# BINTRAY_MAVEN_REPO = selected maven(jar,war) bintray repo based on release tag
+
+set -e
 
 source scripts/helpers.sh
 
@@ -8,6 +23,7 @@ S3_ARTIFACT_PATH="s3://rundeck-travis-artifacts/oss/${TRAVIS_BRANCH}/${RUNDECK_B
 
 mkdir -p artifacts/packaging
 
+# Exports tag info for current TRAVIS_TAG and previous tag
 export_tag_info() {
     local TAG_PARTS
     if [[ ${TAG_PARTS=$(tag_parts "${TRAVIS_TAG}")} && $? != 0 ]] ; then
@@ -16,15 +32,23 @@ export_tag_info() {
         TAG_PARTS=( $TAG_PARTS )
     fi
 
-    echo "${TAG_PARTS[@]}"
-
-    PREV_TAG_PARTS=( $(tag_parts `git describe --abbrev=0`) )
+    PREV_TAG_PARTS=( $(tag_parts `git describe --abbrev=0 --tags $(git describe --abbrev=0)^ `) )
 
     export RUNDECK_RELEASE_VERSION="${TAG_PARTS[0]}"
     export RUNDECK_RELEASE_TAG="${TAG_PARTS[1]:-SNAPSHOT}"
 
     export RUNDECK_PREV_RELEASE_VERSION="${PREV_TAG_PARTS[0]}"
     export RUNDECK_PREV_RELEASE_TAG="${PREV_TAG_PARTS[1]:-SNAPSHOT}"
+}
+
+export_repo_info() {
+    local deb_repo=$(release_tag_repo deb ${RUNDECK_RELEASE_TAG})
+    local rpm_repo=$(release_tag_repo rpm ${RUNDECK_RELEASE_TAG})
+    local maven_repo=$(release_tag_repo maven ${RUNDECK_RELEASE_TAG})
+
+    export BINTRAY_DEB_REPO=$deb_repo
+    export BINTRAY_RPM_REPO=$rpm_repo
+    export BINTRAY_MAVEN_REPO=$maven_repo
 }
 
 # Wraps bash command in code folding and timing "stamps"
@@ -62,7 +86,8 @@ fetch_common_artifacts() {
     )
 }
 
-tag_info
+export_tag_info
+export_repo_info
 
 export -f script_block
 export -f sync_to_s3

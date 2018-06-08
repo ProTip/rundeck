@@ -3,9 +3,9 @@
 # Breaks up git version tag into its constituent parts
 # Outputs "VERSION_NUM RELEASE_TAG RELEASE_TAG_NUMBER|0"
 
-set -ex
+set -e
 
-function tag_parts() {
+tag_parts() {
     local TAG=${1:-''}
 
     if [[ $TAG =~ ^v(([0-9]\.?)+)-?([a-z0-9]+)?-?([0-9]+)? ]] ; then
@@ -22,13 +22,60 @@ function tag_parts() {
     fi
 }
 
+release_tag_repo() {
+    local TYPE=${1:?'Repo type must be (deb|rpm|maven)'}
+    local RELEASE_TAG=${2:?'Release type must be (SNAPSHOT|GA|*)'}
+
+    if [[ "${TYPE}" == 'deb' ]]; then
+        case $RELEASE_TAG in
+            'SNAPSHOT')
+                echo -n 'ci-snapshot-deb'
+                ;;
+            'GA')
+                echo -n 'rundeck-deb'
+                ;;
+            *)
+                echo -n 'beta-deb'
+                ;;
+        esac
+    elif [[ "${TYPE}" == 'rpm' ]] ; then
+        case $RELEASE_TAG in
+            'SNAPSHOT')
+                echo -n 'ci-snapshot-rpm'
+                ;;
+            'GA')
+                echo -n 'rundeck-rpm'
+                ;;
+            *)
+                echo -n 'beta-rpm'
+                ;;
+        esac
+    elif [[ "${TYPE}" == 'maven' ]] ; then
+        case $RELEASE_TAG in
+            'SNAPSHOT')
+                echo -n 'ci-snapshot-maven'
+                ;;
+            'GA')
+                echo -n 'rundeck-maven'
+                ;;
+            *)
+                echo -n 'beta-rpm'
+                ;;
+        esac
+    fi
+}
+
 if [[ "${0}" != "${BASH_SOURCE}" ]] ; then
     true
 else
-    case $1 in
+    COMMAND=${1:-''}
+    shift
+    case $COMMAND in
         'tag_parts')
-            shift
             tag_parts "${@}"
+            ;;
+        'release_tag_repo')
+            release_tag_repo "${@}"
             ;;
         *)
             echo 'Unkown command'
