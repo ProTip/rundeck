@@ -44,22 +44,22 @@ before_script:
 jobs:
   include:
   # Stage: build
-  - stage: build
-    script:
-    - set -o errexit
-    - source travis-helpers.sh
-    - mkdir -p artifacts/packaging
-    - mkdir -p artifacts/rundeckapp/build
+  # - stage: build
+  #   script:
+  #   - set -o errexit
+  #   - source travis-helpers.sh
+  #   - mkdir -p artifacts/packaging
+  #   - mkdir -p artifacts/rundeckapp/build
 
-    - script_block 'build' 'bash jenkins-build.sh no SNAPSHOT'
-    - script_block 'make' 'make TAG=$RUNDECK_RELEASE_TAG BUILD_NUM=$RUNDECK_BUILD_NUMBER rpm deb'
-    - groovy testbuild.groovy -gradle
+  #   - script_block 'build' 'bash jenkins-build.sh no SNAPSHOT'
+  #   - script_block 'make' 'make TAG=$RUNDECK_RELEASE_TAG BUILD_NUM=$RUNDECK_BUILD_NUMBER rpm deb'
+  #   - groovy testbuild.groovy -gradle
 
-    - find ./packaging -regex '.*\.\(deb\|rpm\)' -exec cp --parents {} artifacts \;
-    - cp -r --parents core/build/libs artifacts/
-    - cp -r --parents rundeckapp/build/libs artifacts/
+  #   - find ./packaging -regex '.*\.\(deb\|rpm\)' -exec cp --parents {} artifacts \;
+  #   - cp -r --parents core/build/libs artifacts/
+  #   - cp -r --parents rundeckapp/build/libs artifacts/
 
-    - script_block 'sync-artifacts' sync_to_s3
+  #   - script_block 'sync-artifacts' sync_to_s3
   
   # Stage: test
   - stage: test

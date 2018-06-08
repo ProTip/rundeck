@@ -17,7 +17,8 @@ set -e
 
 source scripts/helpers.sh
 
-export RUNDECK_BUILD_NUMBER="${TRAVIS_BUILD_NUMBER}"
+# export RUNDECK_BUILD_NUMBER="${TRAVIS_BUILD_NUMBER}"
+export RUNDECK_BUILD_NUMBER='3400'
 
 S3_ARTIFACT_PATH="s3://rundeck-travis-artifacts/oss/${TRAVIS_BRANCH}/${RUNDECK_BUILD_NUMBER}/artifacts"
 

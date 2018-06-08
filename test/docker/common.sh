@@ -17,7 +17,6 @@ build_rdtest_docker(){
 	fi
 
 	# setup test dirs
-	mkdir dockers/rundeck/api_test
 	cp -r ../src dockers/rundeck/api_test/
 	cp -r ../api dockers/rundeck/api_test/
 	
