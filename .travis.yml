@@ -65,6 +65,14 @@ jobs:
     - script_block 'sync-artifacts' sync_to_s3
   
   # Stage: test
+  - stage: test
+    env: JOB='Test deb install'
+    script:
+    - set -o errexit
+    - source travis-helpers.sh
+    - script_block 'sync-artifacts' fetch_common_artifacts
+    - script_block 'grails-test' './gradlew test'
+
   # - stage: test
   #   env: JOB='Test deb install'
   #   script:
@@ -122,8 +130,8 @@ jobs:
     - bash scripts/delete-bintray-package.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-staging-rpm rundeck
     - bash scripts/delete-bintray-package.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-staging-rpm rundeck-config
     # Deploy new snapshot packages
-    - bash scripts/deploy-deb-snapshots.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-snapshot-deb "${RUNDECK_BUILD_NUMBER}"
-    - bash scripts/deploy-rpm-snapshots.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-staging-rpm
+    - bash scripts/deploy-deb-snapshots.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-snapshot-deb "${RUNDECK_RELEASE_TAG}" "${RUNDECK_BUILD_NUMBER}"
+    - bash scripts/deploy-rpm-snapshots.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-staging-rpm "${RUNDECK_RELEASE_TAG}"
     - bash scripts/deploy-maven-snapshots.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-snapshot-maven "${RUNDECK_BUILD_NUMBER}"
 
   # Stage: tag release publishes artifacts to the appropriate external repsositories

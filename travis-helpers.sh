@@ -21,8 +21,8 @@ source scripts/helpers.sh
 export RUNDECK_BUILD_NUMBER='3400'
 export RUNDECK_COMMIT="${TRAVIS_COMMIT}"
 
-S3_BUILD_ARTIFACT_PATH="s3://rundeck-travis-artifacts/oss/${TRAVIS_BRANCH}/${RUNDECK_BUILD_NUMBER}/artifacts"
-S3_COMMIT_ARTIFACT_PATH="s3://rundeck-travis-artifacts/oss/${TRAVIS_BRANCH}/${RUNDECK_COMMIT}/artifacts"
+S3_BUILD_ARTIFACT_PATH="s3://rundeck-travis-artifacts/oss/${TRAVIS_BRANCH}/travis-builds/${RUNDECK_BUILD_NUMBER}/artifacts"
+S3_COMMIT_ARTIFACT_PATH="s3://rundeck-travis-artifacts/oss/${TRAVIS_BRANCH}/commits/${RUNDECK_COMMIT}/artifacts"
 
 mkdir -p artifacts/packaging
 
