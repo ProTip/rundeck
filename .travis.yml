@@ -15,8 +15,8 @@ stages:
 - name: snapshot release
   if: fork = false AND type = push AND (branch = master OR env(RUNDECK_RELEASE) IS present)
 - name: tag release
+  if: tag IS present
   # if: fork = false AND type = push AND tag =~ ^v AND (branch = master OR env(RUNDECK_RELEASE) IS present)
-  if: type = push AND tag =~ ^v AND (branch = travis-releases OR env(RUNDECK_RELEASE) IS present)
 
 - name: fork
   if: fork = true
