@@ -8,7 +8,7 @@ set -e
 tag_parts() {
     local TAG=${1:-''}
 
-    if [[ $TAG =~ ^v(([0-9]\.?)+)-?([a-z0-9]+)?-?([0-9]+)? ]] ; then
+    if [[ $TAG =~ ^v(([0-9]+\.?)+)-?([a-z0-9]+)?-?([0-9]+)? ]] ; then
         local RUNDECK_VERSION=${BASH_REMATCH[1]}
         local RUNDECK_RELEASE_TAG=${BASH_REMATCH[3]:-GA}
         local RUNDECK_RELEASE_TAG_NUMBER=${BASH_REMATCH[4]:-0}
