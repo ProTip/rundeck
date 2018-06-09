@@ -63,71 +63,71 @@ jobs:
   #   - script_block 'sync-artifacts' sync_to_s3
   
   # Stage: test
-  - stage: test
-    env: JOB='Test deb install'
-    script:
-    - set -o errexit
-    - source travis-helpers.sh
-    - script_block 'sync-artifacts' fetch_common_artifacts
-    - script_block 'deb-test' 'bash test-docker-install-deb.sh'
+  # - stage: test
+  #   env: JOB='Test deb install'
+  #   script:
+  #   - set -o errexit
+  #   - source travis-helpers.sh
+  #   - script_block 'sync-artifacts' fetch_common_artifacts
+  #   - script_block 'deb-test' 'bash test-docker-install-deb.sh'
   
-  - env: JOB='Test rpm install'
-    script:
-    - set -o errexit
-    - source travis-helpers.sh
-    - script_block 'sync-artifacts' fetch_common_artifacts
-    - script_block 'rpm-test' 'bash test-docker-install-rpm.sh'
+  # - env: JOB='Test rpm install'
+  #   script:
+  #   - set -o errexit
+  #   - source travis-helpers.sh
+  #   - script_block 'sync-artifacts' fetch_common_artifacts
+  #   - script_block 'rpm-test' 'bash test-docker-install-rpm.sh'
 
-  - env: JOB='Docker API tests'
-    script:
-    - set -o errexit
-    - source travis-helpers.sh
-    - script_block 'sync-artifacts' fetch_common_artifacts
-    - script_block 'api-test' 'DOCKER_COMPOSE_SPEC=docker-compose-api-mysql.yaml bash run-docker-api-tests.sh'
+  # - env: JOB='Docker API tests'
+  #   script:
+  #   - set -o errexit
+  #   - source travis-helpers.sh
+  #   - script_block 'sync-artifacts' fetch_common_artifacts
+  #   - script_block 'api-test' 'DOCKER_COMPOSE_SPEC=docker-compose-api-mysql.yaml bash run-docker-api-tests.sh'
 
-  - env: JOB='Docker tests'
-    script:
-    - set -o errexit
-    - source travis-helpers.sh
-    - script_block 'sync-artifacts' fetch_common_artifacts
-    - script_block 'docker-test' 'bash run-docker-tests.sh'
+  # - env: JOB='Docker tests'
+  #   script:
+  #   - set -o errexit
+  #   - source travis-helpers.sh
+  #   - script_block 'sync-artifacts' fetch_common_artifacts
+  #   - script_block 'docker-test' 'bash run-docker-tests.sh'
   
-  - env: JOB='Docker SSL tests'
-    script:
-    - set -o errexit
-    - source travis-helpers.sh
-    - script_block 'sync-artifacts' fetch_common_artifacts
-    - script_block 'docker-ssl-test' 'bash run-docker-ssl-tests.sh'
+  # - env: JOB='Docker SSL tests'
+  #   script:
+  #   - set -o errexit
+  #   - source travis-helpers.sh
+  #   - script_block 'sync-artifacts' fetch_common_artifacts
+  #   - script_block 'docker-ssl-test' 'bash run-docker-ssl-tests.sh'
 
-  - env: JOB='Docker Ansible tests'
-    script:
-    - set -o errexit
-    - source travis-helpers.sh
-    - script_block 'sync-artifacts' fetch_common_artifacts
-    - script_block 'docker-ansible-test' 'bash run-docker-ansible-tests.sh'
+  # - env: JOB='Docker Ansible tests'
+  #   script:
+  #   - set -o errexit
+  #   - source travis-helpers.sh
+  #   - script_block 'sync-artifacts' fetch_common_artifacts
+  #   - script_block 'docker-ansible-test' 'bash run-docker-ansible-tests.sh'
 
-  # Stage: snapshot release publishes snapshot artifacts to external repositories
-  - stage: snapshot release
-    script:
-    - set -o errexit
-    - source travis-helpers.sh
-    - script_block 'sync-artifacts' fetch_common_artifacts
-    - export VCS_URL=https://github.com/rundeck/rundeck.git
-    # Delete existing packages
-    - bash scripts/delete-bintray-package.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-snapshot-deb rundeck
-    - bash scripts/delete-bintray-package.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-staging-rpm rundeck
-    - bash scripts/delete-bintray-package.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-staging-rpm rundeck-config
-    # Deploy new snapshot packages
-    - bash scripts/deploy-deb-snapshots.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-snapshot-deb "${RUNDECK_BUILD_NUMBER}"
-    - bash scripts/deploy-rpm-snapshots.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-staging-rpm
-    - bash scripts/deploy-maven-snapshots.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-snapshot-maven "${RUNDECK_BUILD_NUMBER}"
+  # # Stage: snapshot release publishes snapshot artifacts to external repositories
+  # - stage: snapshot release
+  #   script:
+  #   - set -o errexit
+  #   - source travis-helpers.sh
+  #   - script_block 'sync-artifacts' fetch_common_artifacts
+  #   - export VCS_URL=https://github.com/rundeck/rundeck.git
+  #   # Delete existing packages
+  #   - bash scripts/delete-bintray-package.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-snapshot-deb rundeck
+  #   - bash scripts/delete-bintray-package.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-staging-rpm rundeck
+  #   - bash scripts/delete-bintray-package.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-staging-rpm rundeck-config
+  #   # Deploy new snapshot packages
+  #   - bash scripts/deploy-deb-snapshots.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-snapshot-deb "${RUNDECK_BUILD_NUMBER}"
+  #   - bash scripts/deploy-rpm-snapshots.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-staging-rpm
+  #   - bash scripts/deploy-maven-snapshots.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-snapshot-maven "${RUNDECK_BUILD_NUMBER}"
 
   # Stage: tag release publishes artifacts to the appropriate external repsositories
   - stage: tag release
     script:
     - set -o errexit
     - source travis-helpers.sh
-    - script_block 'sync-artifacts' fetch_common_artifacts
+    # - script_block 'sync-artifacts' fetch_common_artifacts
     - export VCS_URL=https://github.com/rundeck/rundeck.git
 
     - printenv
