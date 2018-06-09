@@ -54,7 +54,7 @@ jobs:
     - mkdir -p artifacts/packaging
     - mkdir -p artifacts/rundeckapp/build
 
-    - script_block 'build' 'bash jenkins-build.sh no SNAPSHOT'
+    # - script_block 'build' 'bash jenkins-build.sh no SNAPSHOT'
     - script_block 'make' 'make TAG=$RUNDECK_RELEASE_TAG BUILD_NUM=$RUNDECK_BUILD_NUMBER rpm deb'
     - groovy testbuild.groovy -gradle
 
