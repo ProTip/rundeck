@@ -19,8 +19,10 @@ source scripts/helpers.sh
 
 # export RUNDECK_BUILD_NUMBER="${TRAVIS_BUILD_NUMBER}"
 export RUNDECK_BUILD_NUMBER='3400'
+export RUNDECK_COMMIT="${TRAVIS_COMMIT}"
 
-S3_ARTIFACT_PATH="s3://rundeck-travis-artifacts/oss/${TRAVIS_BRANCH}/${RUNDECK_BUILD_NUMBER}/artifacts"
+S3_BUILD_ARTIFACT_PATH="s3://rundeck-travis-artifacts/oss/${TRAVIS_BRANCH}/${RUNDECK_BUILD_NUMBER}/artifacts"
+S3_COMMIT_ARTIFACT_PATH="s3://rundeck-travis-artifacts/oss/${TRAVIS_BRANCH}/${RUNDECK_COMMIT}/artifacts"
 
 mkdir -p artifacts/packaging
 
@@ -69,17 +71,22 @@ script_block() {
 }
 
 sync_from_s3() {
-    aws s3 sync --delete "${S3_ARTIFACT_PATH}" artifacts
+    aws s3 sync --delete "${S3_BUILD_ARTIFACT_PATH}" artifacts
 }
 
 sync_to_s3() {
-    aws s3 sync --delete ./artifacts $S3_ARTIFACT_PATH
+    aws s3 sync --delete ./artifacts "$S3_BUILD_ARTIFACT_PATH"
 }
 
-# Helper function that syncs artifacts from s3
-# and copies the most common into place.
-fetch_common_artifacts() {
-    sync_from_s3
+sync_commit_from_s3() {
+    aws s3 sync --delete "${S3_COMMIT_ARTIFACT_PATH}" artifacts
+}
+
+sync_commit_to_s3() {
+    aws s3 sync --delete ./artifacts "$S3_COMMIT_ARTIFACT_PATH"
+}
+
+extract_artifacts() {
     # Drop to subshell and change dir; courtesy roundup
     (
         cd artifacts
@@ -87,10 +94,24 @@ fetch_common_artifacts() {
     )
 }
 
+# Helper function that syncs artifacts from s3
+# and copies the most common into place.
+fetch_common_artifacts() {
+    sync_from_s3
+    extract_artifacts
+}
+
+fetch_commit_common_artifacts() {
+    sync_commit_from_s3
+    extract_artifacts
+}
+
 export_tag_info
 export_repo_info
 
 export -f script_block
 export -f sync_to_s3
+export -f sync_commit_to_s3
 export -f sync_from_s3
+export -f sync_commit_from_s3
 export -f fetch_common_artifacts

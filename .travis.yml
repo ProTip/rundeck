@@ -9,11 +9,13 @@ services:
 
 stages:
 - name: build
-  if: fork = false
+  # if: fork = false AND tag NOT present
+  if: tag NOT present
 - name: test
-  if: fork = false
+  if: fork = false AND tag NOT present
 - name: snapshot release
-  if: fork = false AND type = push AND (branch = master OR env(RUNDECK_RELEASE) IS present)
+  # if: fork = false AND type = push AND (branch = master OR env(RUNDECK_RELEASE) IS present) AND tag NOT present
+  if: tag NOT present
 - name: tag release
   if: tag IS present
   # if: fork = false AND type = push AND tag =~ ^v AND (branch = master OR env(RUNDECK_RELEASE) IS present)
@@ -44,23 +46,23 @@ before_script:
 
 jobs:
   include:
-  # Stage: build
-  # - stage: build
-  #   script:
-  #   - set -o errexit
-  #   - source travis-helpers.sh
-  #   - mkdir -p artifacts/packaging
-  #   - mkdir -p artifacts/rundeckapp/build
+  Stage: build
+  - stage: build
+    script:
+    - set -o errexit
+    - source travis-helpers.sh
+    - mkdir -p artifacts/packaging
+    - mkdir -p artifacts/rundeckapp/build
 
-  #   - script_block 'build' 'bash jenkins-build.sh no SNAPSHOT'
-  #   - script_block 'make' 'make TAG=$RUNDECK_RELEASE_TAG BUILD_NUM=$RUNDECK_BUILD_NUMBER rpm deb'
-  #   - groovy testbuild.groovy -gradle
+    - script_block 'build' 'bash jenkins-build.sh no SNAPSHOT'
+    - script_block 'make' 'make TAG=$RUNDECK_RELEASE_TAG BUILD_NUM=$RUNDECK_BUILD_NUMBER rpm deb'
+    - groovy testbuild.groovy -gradle
 
-  #   - find ./packaging -regex '.*\.\(deb\|rpm\)' -exec cp --parents {} artifacts \;
-  #   - cp -r --parents core/build/libs artifacts/
-  #   - cp -r --parents rundeckapp/build/libs artifacts/
+    - find ./packaging -regex '.*\.\(deb\|rpm\)' -exec cp --parents {} artifacts \;
+    - cp -r --parents core/build/libs artifacts/
+    - cp -r --parents rundeckapp/build/libs artifacts/
 
-  #   - script_block 'sync-artifacts' sync_to_s3
+    - script_block 'sync-artifacts' sync_to_s3
   
   # Stage: test
   # - stage: test
@@ -107,27 +109,28 @@ jobs:
   #   - script_block 'docker-ansible-test' 'bash run-docker-ansible-tests.sh'
 
   # # Stage: snapshot release publishes snapshot artifacts to external repositories
-  # - stage: snapshot release
-  #   script:
-  #   - set -o errexit
-  #   - source travis-helpers.sh
-  #   - script_block 'sync-artifacts' fetch_common_artifacts
-  #   - export VCS_URL=https://github.com/rundeck/rundeck.git
-  #   # Delete existing packages
-  #   - bash scripts/delete-bintray-package.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-snapshot-deb rundeck
-  #   - bash scripts/delete-bintray-package.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-staging-rpm rundeck
-  #   - bash scripts/delete-bintray-package.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-staging-rpm rundeck-config
-  #   # Deploy new snapshot packages
-  #   - bash scripts/deploy-deb-snapshots.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-snapshot-deb "${RUNDECK_BUILD_NUMBER}"
-  #   - bash scripts/deploy-rpm-snapshots.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-staging-rpm
-  #   - bash scripts/deploy-maven-snapshots.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-snapshot-maven "${RUNDECK_BUILD_NUMBER}"
+  - stage: snapshot release
+    script:
+    - set -o errexit
+    - source travis-helpers.sh
+    - script_block 'sync-artifacts' fetch_common_artifacts
+    - script_block 'sync-commit' sync_commit_to_s3
+    - export VCS_URL=https://github.com/rundeck/rundeck.git
+    # Delete existing packages
+    - bash scripts/delete-bintray-package.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-snapshot-deb rundeck
+    - bash scripts/delete-bintray-package.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-staging-rpm rundeck
+    - bash scripts/delete-bintray-package.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-staging-rpm rundeck-config
+    # Deploy new snapshot packages
+    - bash scripts/deploy-deb-snapshots.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-snapshot-deb "${RUNDECK_BUILD_NUMBER}"
+    - bash scripts/deploy-rpm-snapshots.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-staging-rpm
+    - bash scripts/deploy-maven-snapshots.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck ci-snapshot-maven "${RUNDECK_BUILD_NUMBER}"
 
   # Stage: tag release publishes artifacts to the appropriate external repsositories
   - stage: tag release
     script:
     - set -o errexit
     - source travis-helpers.sh
-    # - script_block 'sync-artifacts' fetch_common_artifacts
+    - script_block 'sync-artifacts' fetch_commit_common_artifacts
     - export VCS_URL=https://github.com/rundeck/rundeck.git
 
     - printenv
