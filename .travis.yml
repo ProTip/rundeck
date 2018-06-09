@@ -15,7 +15,8 @@ stages:
 - name: snapshot release
   if: fork = false AND type = push AND (branch = master OR env(RUNDECK_RELEASE) IS present)
 - name: tag release
-  if: fork = false AND type = push AND tag =~ ^v AND (branch = master OR env(RUNDECK_RELEASE) IS present)
+  # if: fork = false AND type = push AND tag =~ ^v AND (branch = master OR env(RUNDECK_RELEASE) IS present)
+  if: type = push AND tag =~ ^v AND (branch = travis-releases OR env(RUNDECK_RELEASE) IS present)
 
 - name: fork
   if: fork = true
@@ -128,10 +129,13 @@ jobs:
     - source travis-helpers.sh
     - script_block 'sync-artifacts' fetch_common_artifacts
     - export VCS_URL=https://github.com/rundeck/rundeck.git
+
+    - printenv
+
     # Deploy new snapshot packages
-    - bash scripts/deploy-deb-snapshots.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck "${BINTRAY_DEB_REPO}" "${RUNDECK_BUILD_NUMBER}"
-    - bash scripts/deploy-rpm-snapshots.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck "${BINTRAY_RPM_REPO}"
-    - bash scripts/deploy-maven-snapshots.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck "${BINTRAY_MAVEN_REPO}" "${RUNDECK_BUILD_NUMBER}"
+    # - bash scripts/deploy-deb-snapshots.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck "${BINTRAY_DEB_REPO}" "${RUNDECK_BUILD_NUMBER}"
+    # - bash scripts/deploy-rpm-snapshots.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck "${BINTRAY_RPM_REPO}"
+    # - bash scripts/deploy-maven-snapshots.sh "${BINTRAY_USER}" "${BINTRAY_API_KEY}" rundeck "${BINTRAY_MAVEN_REPO}" "${RUNDECK_BUILD_NUMBER}"
 
   # Stage: fork consolidates all tests into one job.
   # Forks do not have access to encrypted envars so we can't pass artifacts between jobs/stages.
