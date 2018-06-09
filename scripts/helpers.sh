@@ -59,7 +59,7 @@ release_tag_repo() {
                 echo -n 'rundeck-maven'
                 ;;
             *)
-                echo -n 'beta-rpm'
+                echo -n 'beta-maven'
                 ;;
         esac
     fi
