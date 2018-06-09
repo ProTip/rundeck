@@ -70,55 +70,55 @@ jobs:
   
   # Stage: test
   - stage: test
-    env: JOB='Test deb install'
+    env: JOB='Test Grails'
     script:
     - set -o errexit
     - source travis-helpers.sh
     - script_block 'sync-artifacts' fetch_common_artifacts
     - script_block 'grails-test' './gradlew -g gradle-cache test'
 
-  # - stage: test
-  #   env: JOB='Test deb install'
-  #   script:
-  #   - set -o errexit
-  #   - source travis-helpers.sh
-  #   - script_block 'sync-artifacts' fetch_common_artifacts
-  #   - script_block 'deb-test' 'bash test-docker-install-deb.sh'
+  - env: JOB='Docker API tests'
+    script:
+    - set -o errexit
+    - source travis-helpers.sh
+    - script_block 'sync-artifacts' fetch_common_artifacts
+    - script_block 'api-test' 'DOCKER_COMPOSE_SPEC=docker-compose-api-mysql.yaml bash run-docker-api-tests.sh'
+
+  - stage: test
+    env: JOB='Test deb install'
+    script:
+    - set -o errexit
+    - source travis-helpers.sh
+    - script_block 'sync-artifacts' fetch_common_artifacts
+    - script_block 'deb-test' 'bash test-docker-install-deb.sh'
   
-  # - env: JOB='Test rpm install'
-  #   script:
-  #   - set -o errexit
-  #   - source travis-helpers.sh
-  #   - script_block 'sync-artifacts' fetch_common_artifacts
-  #   - script_block 'rpm-test' 'bash test-docker-install-rpm.sh'
+  - env: JOB='Test rpm install'
+    script:
+    - set -o errexit
+    - source travis-helpers.sh
+    - script_block 'sync-artifacts' fetch_common_artifacts
+    - script_block 'rpm-test' 'bash test-docker-install-rpm.sh'
 
-  # - env: JOB='Docker API tests'
-  #   script:
-  #   - set -o errexit
-  #   - source travis-helpers.sh
-  #   - script_block 'sync-artifacts' fetch_common_artifacts
-  #   - script_block 'api-test' 'DOCKER_COMPOSE_SPEC=docker-compose-api-mysql.yaml bash run-docker-api-tests.sh'
-
-  # - env: JOB='Docker tests'
-  #   script:
-  #   - set -o errexit
-  #   - source travis-helpers.sh
-  #   - script_block 'sync-artifacts' fetch_common_artifacts
-  #   - script_block 'docker-test' 'bash run-docker-tests.sh'
+  - env: JOB='Docker tests'
+    script:
+    - set -o errexit
+    - source travis-helpers.sh
+    - script_block 'sync-artifacts' fetch_common_artifacts
+    - script_block 'docker-test' 'bash run-docker-tests.sh'
   
-  # - env: JOB='Docker SSL tests'
-  #   script:
-  #   - set -o errexit
-  #   - source travis-helpers.sh
-  #   - script_block 'sync-artifacts' fetch_common_artifacts
-  #   - script_block 'docker-ssl-test' 'bash run-docker-ssl-tests.sh'
+  - env: JOB='Docker SSL tests'
+    script:
+    - set -o errexit
+    - source travis-helpers.sh
+    - script_block 'sync-artifacts' fetch_common_artifacts
+    - script_block 'docker-ssl-test' 'bash run-docker-ssl-tests.sh'
 
-  # - env: JOB='Docker Ansible tests'
-  #   script:
-  #   - set -o errexit
-  #   - source travis-helpers.sh
-  #   - script_block 'sync-artifacts' fetch_common_artifacts
-  #   - script_block 'docker-ansible-test' 'bash run-docker-ansible-tests.sh'
+  - env: JOB='Docker Ansible tests'
+    script:
+    - set -o errexit
+    - source travis-helpers.sh
+    - script_block 'sync-artifacts' fetch_common_artifacts
+    - script_block 'docker-ansible-test' 'bash run-docker-ansible-tests.sh'
 
   # # Stage: snapshot release publishes snapshot artifacts to external repositories
   - stage: snapshot release
