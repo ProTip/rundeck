@@ -46,7 +46,7 @@ before_script:
 
 jobs:
   include:
-  Stage: build
+  # Stage: build
   - stage: build
     script:
     - set -o errexit
@@ -113,6 +113,7 @@ jobs:
     script:
     - set -o errexit
     - source travis-helpers.sh
+    # Sync artifacts under commit so we can use them for tag releases
     - script_block 'sync-artifacts' fetch_common_artifacts
     - script_block 'sync-commit' sync_commit_to_s3
     - export VCS_URL=https://github.com/rundeck/rundeck.git
