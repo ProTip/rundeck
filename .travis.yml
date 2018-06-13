@@ -58,8 +58,8 @@ jobs:
     - mkdir -p artifacts/packaging
     - mkdir -p artifacts/rundeckapp/build
 
-    - script_block 'build' './gradlew -g gradle-cache --build-cache bootRepackage'
-    # - script_block 'make' 'make TAG=$RUNDECK_RELEASE_TAG BUILD_NUM=$RUNDECK_BUILD_NUMBER rpm deb'
+    - script_block 'build' './gradlew -g gradle-cache --build-cache assemble'
+    - script_block 'make' 'make TAG=$RUNDECK_RELEASE_TAG BUILD_NUM=$RUNDECK_BUILD_NUMBER rpm deb'
     - groovy testbuild.groovy -gradle
 
     - find ./packaging -regex '.*\.\(deb\|rpm\)' -exec cp --parents {} artifacts \;
