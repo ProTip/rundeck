@@ -18,33 +18,33 @@ die(){
 }
 
 check_args(){
-	if [ ${#ARGS[@]} -gt 0 ] ; then
-    	DOCKER_DIR=$1
-	fi
+    if [ ${#ARGS[@]} -gt 0 ] ; then
+        DOCKER_DIR=$1
+    fi
 }
-copy_jar(){
-	local FARGS=("$@")
-	local DIR=${FARGS[0]}
-	local -a VERS=( $( rd_get_version ) )
-	local JAR=rundeck-${VERS[0]}-${VERS[2]}.war
-    local buildJar=$PWD/rundeckapp/build/libs/$JAR
-	test -f $buildJar || die "Jar file not found $buildJar"
-	mkdir -p $DIR
-	cp $buildJar $DIR/rundeck-launcher.war
-	echo $DIR/$JAR
-}
-run_tests(){
-	local FARGS=("$@")
-	local DIR=${FARGS[0]}
 
-	cd $DIR
-	bash $DIR/test-ssl.sh
+copy_jar(){
+    local FARGS=("$@")
+    local DIR=${FARGS[0]}
+    
+    local buildJar=( $PWD/rundeckapp/build/libs/*.war )
+    echo "Testing against ${buildJar[0]}"
+    test -d $DIR || mkdir -p $DIR
+    cp ${buildJar[0]} $DIR/rundeck-launcher.war
+}
+
+run_tests(){
+    local FARGS=("$@")
+    local DIR=${FARGS[0]}
+
+    cd $DIR
+    bash $DIR/test-ssl.sh
 }
 run_docker_test(){
-	local FARGS=("$@")
-	local DIR=${FARGS[0]}
-	local launcherJar=$( copy_jar $DIR ) || die "Failed to copy jar"
-	run_tests $DIR
+    local FARGS=("$@")
+    local DIR=${FARGS[0]}
+    ( copy_jar $DIR ) || die "Failed to copy jar"
+    run_tests $DIR
 }
 
 
