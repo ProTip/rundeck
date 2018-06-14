@@ -9,9 +9,9 @@ services:
 
 stages:
 - name: build
-  # if: fork = false AND tag NOT present
+  if: fork = false
 - name: test
-  if: fork = false AND tag NOT present
+  if: fork = false
 - name: snapshot release
   # if: fork = false AND type = push AND (branch = master OR env(RUNDECK_RELEASE) IS present) AND tag NOT present
   if: tag NOT present
